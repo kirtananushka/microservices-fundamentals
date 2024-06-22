@@ -1,0 +1,459 @@
+{
+  "info": {
+    "name": "MSFundamentals-0",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Resource Service",
+      "item": [
+        {
+          "name": "Create Resource",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "audio/mpeg"
+              }
+            ],
+            "body": {
+              "mode": "file",
+              "file": {
+                "src": "/C:/Users/Kir_Tananushka/OneDrive - EPAM/MyTrainings/OpenAPI/mp3/across.mp3"
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8071/resources",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8071",
+              "path": [
+                "resources"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Resource by ID",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "audio/mpeg"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "http://localhost:8071/resources/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8071",
+              "path": [
+                "resources",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Resources",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "audio/mpeg"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "http://localhost:8071/resources",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8071",
+              "path": [
+                "resources"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Resource by ID",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "audio/mpeg"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "http://localhost:8071/resources?id=1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8071",
+              "path": [
+                "resources"
+              ],
+              "query": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete All Resources",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "audio/mpeg"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "http://localhost:8071/resources/all",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8071",
+              "path": [
+                "resources",
+                "all"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Discovery Services",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8071/discovery/services",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8071",
+              "path": [
+                "discovery",
+                "services"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Song Service",
+      "item": [
+        {
+          "name": "Create Song",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"id\": 1,\r\n  \"artist\": \"artist\",\r\n  \"name\": \"name\",\r\n  \"album\": \"album\",\r\n  \"year\": \"2000\",\r\n  \"duration\": \"01:20\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8072/songs",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8072",
+              "path": [
+                "songs"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Song by ID",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "audio/mpeg"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "http://localhost:8072/songs/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8072",
+              "path": [
+                "songs",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Songs",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "audio/mpeg"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "http://localhost:8072/songs",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8072",
+              "path": [
+                "songs"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Songs by IDs",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "audio/mpeg"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "http://localhost:8072/songs?id=1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8072",
+              "path": [
+                "songs"
+              ],
+              "query": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete All Songs",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "audio/mpeg"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "http://localhost:8072/songs",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8072",
+              "path": [
+                "songs"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Health Checks",
+      "item": [
+        {
+          "name": "Eureka Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8761/eureka-svc/health",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8761",
+              "path": [
+                "eureka-svc",
+                "health"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Resource Service Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8071/resource-svc/health",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8071",
+              "path": [
+                "resource-svc",
+                "health"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Resource Service Custom Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8071/resource-svc/health/custom",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8071",
+              "path": [
+                "resource-svc",
+                "health",
+                "custom"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Song Service Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8072/song-svc/health",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8072",
+              "path": [
+                "song-svc",
+                "health"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Song Service Custom Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8072/song-svc/health/custom",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8072",
+              "path": [
+                "song-svc",
+                "health",
+                "custom"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
