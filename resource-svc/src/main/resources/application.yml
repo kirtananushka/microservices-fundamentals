@@ -1,29 +1,25 @@
 server:
   port: 8071
-
 logging:
   level:
     com.tananushka.resource.svc: DEBUG
     root: INFO
-
 spring:
   application:
     name: "resource-svc"
   datasource:
-    url: "jdbc:postgresql://${DB_HOST}:5432/resource_svc_db"
+    url: "jdbc:postgresql://${DB_HOST:localhost}:5432/resource_svc_db"
     username: "${DB_USERNAME}"
     password: "${DB_PASSWORD}"
   jpa:
     properties:
       hibernate:
-        dialect=org.hibernate.dialect.PostgreSQLDialect
-
+        dialect: org.hibernate.dialect.PostgreSQLDialect
 svc:
   song-svc:
     name: "SONG-SVC"
     songs-endpoint: "/songs"
     health-endpoint: "/song-svc/health"
-
 eureka:
   instance:
     leaseRenewalIntervalInSeconds: 10
@@ -31,7 +27,6 @@ eureka:
   client:
     serviceUrl:
       defaultZone: "${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://localhost:8761/eureka/}"
-
 management:
   endpoint:
     health:
@@ -46,3 +41,12 @@ management:
       base-path: /
       path-mapping:
         health: resource-svc/health
+cloud:
+  aws:
+    endpoint: "${AWS_ENDPOINT_URL:http://localhost:4566}"
+    region: us-east-1
+    s3:
+      bucket: resource-bucket
+    credentials:
+      accessKey: "${AWS_ACCESS_KEY}"
+      secretKey: "${AWS_SECRET_KEY}"

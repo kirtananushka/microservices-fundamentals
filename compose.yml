@@ -31,6 +31,23 @@ services:
       timeout: 10s
       retries: 20
 
+  localstack:
+    image: localstack/localstack
+    ports:
+      - "4566:4566"
+    environment:
+      - SERVICES=s3
+      - AWS_DEFAULT_REGION=us-east-1
+    volumes:
+      - ./localstack-volume:/var/lib/localstack
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD-SHELL", "awslocal s3 ls || exit 1" ]
+      interval: 10s
+      timeout: 10s
+      retries: 20
+
   resource-svc:
     build:
       context: ./resource-svc
@@ -41,6 +58,9 @@ services:
       DB_USERNAME: ${DB_USERNAME}
       DB_PASSWORD: ${DB_PASSWORD}
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+      AWS_ENDPOINT_URL: http://localstack:4566
+      AWS_ACCESS_KEY: ${AWS_ACCESS_KEY}
+      AWS_SECRET_KEY: ${AWS_SECRET_KEY}
     ports:
       - "8071:8071"
     depends_on:
@@ -49,6 +69,8 @@ services:
       song-svc:
         condition: service_healthy
       eureka-server:
+        condition: service_healthy
+      localstack:
         condition: service_healthy
     restart: unless-stopped
     healthcheck:

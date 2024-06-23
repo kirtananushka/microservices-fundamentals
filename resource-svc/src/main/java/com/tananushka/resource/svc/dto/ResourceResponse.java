@@ -4,6 +4,6 @@ import lombok.Data;
 
 @Data
 public class ResourceResponse {
-
     private Integer id;
+    private String s3Url;
 }

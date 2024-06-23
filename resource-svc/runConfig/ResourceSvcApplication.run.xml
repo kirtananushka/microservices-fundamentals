@@ -3,14 +3,21 @@
                  factoryName="Spring Boot" nameIsGenerated="true">
     <envs>
       <env name="DB_HOST" value="localhost"/>
-      <env name="DB_USERNAME" value="postgres"/>
       <env name="DB_PASSWORD" value="1111"/>
-      <env name="SONG_SVC" value="localhost"/>
+      <env name="DB_USERNAME" value="postgres"/>
       <env name="EUREKA_CLIENT_SERVICEURL_DEFAULTZONE" value="http://localhost:8761/eureka/"/>
+      <env name="SONG_SVC" value="localhost"/>
+      <env name="AWS_ACCESS_KEY" value="accessKey"/>
+      <env name="AWS_SECRET_KEY" value="secretKey"/>
     </envs>
     <option name="FRAME_DEACTIVATION_UPDATE_POLICY" value="UpdateClassesAndResources"/>
     <module name="resource-svc"/>
     <option name="SPRING_BOOT_MAIN_CLASS" value="com.tananushka.resource.svc.ResourceSvcApplication"/>
+    <extension name="software.aws.toolkits.jetbrains.core.execution.JavaAwsConnectionExtension">
+      <option name="credential"/>
+      <option name="region"/>
+      <option name="useCurrentConnection" value="false"/>
+    </extension>
     <method v="2">
       <option name="Make" enabled="true"/>
     </method>

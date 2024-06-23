@@ -15,14 +15,11 @@ import lombok.Setter;
 @Setter
 @RequiredArgsConstructor
 @AllArgsConstructor
-
 public class Resource {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(columnDefinition = "bytea")
-    private byte[] audioData;
-
+    @Column(name = "s3_location", nullable = false)
+    private String s3Location;
 }

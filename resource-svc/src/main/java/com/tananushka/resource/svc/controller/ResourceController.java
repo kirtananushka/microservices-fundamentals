@@ -44,7 +44,7 @@ public class ResourceController {
 
     @GetMapping
     public ResponseEntity<List<ResourceResponse>> getAllResources() {
-        return ResponseEntity.ok().body(resourceService.findAllIds());
+        return ResponseEntity.ok().body(resourceService.findAll());
     }
 
     @DeleteMapping
