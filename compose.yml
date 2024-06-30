@@ -1,21 +1,5 @@
 version: '3.9'
 services:
-  eureka-server:
-    build:
-      context: ./eureka-svc
-      dockerfile: Dockerfile
-    image: eureka-server
-    environment:
-      HOSTNAME: eureka-server
-    ports:
-      - "8761:8761"
-    restart: unless-stopped
-    healthcheck:
-      test: [ "CMD", "curl", "-f", "http://eureka-server:8761/eureka-svc/health" ]
-      interval: 10s
-      timeout: 10s
-      retries: 20
-
   postgres:
     image: postgres:alpine
     environment:
@@ -47,37 +31,39 @@ services:
       interval: 10s
       timeout: 10s
       retries: 20
-
-  resource-svc:
-    build:
-      context: ./resource-svc
-      dockerfile: Dockerfile
-    image: resource-svc
-    environment:
-      DB_HOST: ${DB_HOST}
-      DB_USERNAME: ${DB_USERNAME}
-      DB_PASSWORD: ${DB_PASSWORD}
-      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
-      AWS_ENDPOINT_URL: http://localstack:4566
-      AWS_ACCESS_KEY: ${AWS_ACCESS_KEY}
-      AWS_SECRET_KEY: ${AWS_SECRET_KEY}
-    ports:
-      - "8071:8071"
-    depends_on:
-      postgres:
-        condition: service_healthy
-      song-svc:
-        condition: service_healthy
-      eureka-server:
-        condition: service_healthy
-      localstack:
-        condition: service_healthy
+  
+  activemq:
+    image: apache/activemq-classic:6.1.1
+    container_name: activemq-server
     restart: unless-stopped
+    ports:
+      - "8161:8161"
+      - "61616:61616"
+    environment:
+      ACTIVEMQ_REMOVE_DEFAULT_ACCOUNTS: "true"
+      ACTIVEMQ_ADMIN_LOGIN: "admin"
+      ACTIVEMQ_ADMIN_PASSWORD: "admin"
     healthcheck:
-      test: [ "CMD", "curl", "-f", "http://resource-svc:8071/resource-svc/health" ]
+      test: [ "CMD-SHELL", "curl -sf http://localhost:8161 | grep -q 'ActiveMQ'" ]
       interval: 10s
       timeout: 10s
-      retries: 10
+      retries: 20
+
+  eureka-server:
+    build:
+      context: ./eureka-svc
+      dockerfile: Dockerfile
+    image: eureka-server
+    environment:
+      HOSTNAME: eureka-server
+    ports:
+      - "8761:8761"
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://eureka-server:8761/eureka-svc/health" ]
+      interval: 10s
+      timeout: 10s
+      retries: 20
 
   song-svc:
     build:
@@ -85,10 +71,10 @@ services:
       dockerfile: Dockerfile
     image: song-svc
     environment:
-      DB_HOST: ${DB_HOST}
+      DB_HOST: postgres
       DB_USERNAME: ${DB_USERNAME}
       DB_PASSWORD: ${DB_PASSWORD}
-      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+      EUREKA_HOST: eureka-server
     ports:
       - "8072:8072"
     depends_on:
@@ -103,6 +89,66 @@ services:
       timeout: 10s
       retries: 20
 
-# docker compose up -d --build
-# docker compose up -d --build --scale song-svc=2 
-# docker compose up -d --scale song-svc=2
+  resource-svc:
+    build:
+      context: ./resource-svc
+      dockerfile: Dockerfile
+    image: resource-svc
+    environment:
+      DB_HOST: postgres
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      EUREKA_HOST: eureka-server
+      AWS_ENDPOINT_URL: http://localstack:4566
+      AWS_ACCESS_KEY: ${AWS_ACCESS_KEY}
+      AWS_SECRET_KEY: ${AWS_SECRET_KEY}
+      ACTIVEMQ_HOST: activemq
+      ACTIVEMQ_USERNAME: ${ACTIVEMQ_USERNAME}
+      ACTIVEMQ_PASSWORD: ${ACTIVEMQ_PASSWORD}
+    ports:
+      - "8071:8071"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      song-svc:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+      localstack:
+        condition: service_healthy
+      activemq:
+        condition: service_started
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://resource-svc:8071/resource-svc/health" ]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+
+  resource-proc:
+    build:
+      context: ./resource-proc
+      dockerfile: Dockerfile
+    image: resource-proc
+    environment:
+      EUREKA_HOST: eureka-server
+      ACTIVEMQ_HOST: activemq
+      ACTIVEMQ_USERNAME: ${ACTIVEMQ_USERNAME}
+      ACTIVEMQ_PASSWORD: ${ACTIVEMQ_PASSWORD}
+    ports:
+      - "8073:8073"
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+      activemq:
+        condition: service_started
+      resource-svc:
+        condition: service_healthy
+      song-svc:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://resource-proc:8073/resource-proc/health" ]
+      interval: 10s
+      timeout: 10s
+      retries: 10

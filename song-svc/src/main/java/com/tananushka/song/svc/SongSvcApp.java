@@ -8,10 +8,9 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @SpringBootApplication
 @EnableTransactionManagement
 @EnableDiscoveryClient
-public class SongSvcApplication {
+public class SongSvcApp {
 
     public static void main(String[] args) {
-        SpringApplication.run(SongSvcApplication.class, args);
+        SpringApplication.run(SongSvcApp.class, args);
     }
-
 }

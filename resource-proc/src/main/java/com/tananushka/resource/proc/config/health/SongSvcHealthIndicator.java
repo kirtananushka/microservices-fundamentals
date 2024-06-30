@@ -1,6 +1,6 @@
-package com.tananushka.resource.svc.config.health;
+package com.tananushka.resource.proc.config.health;
 
-import com.tananushka.resource.svc.client.SongSvcClient;
+import com.tananushka.resource.proc.client.SongSvcClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.HealthIndicator;
@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class ExternalApiHealthIndicator implements HealthIndicator {
+public class SongSvcHealthIndicator implements HealthIndicator {
 
     private final SongSvcClient songSvcClient;
 

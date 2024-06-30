@@ -3,7 +3,8 @@ package com.tananushka.resource.proc.dto;
 import lombok.Data;
 
 @Data
-public class SongRequest {
+public class MetadataRequest {
+    private Integer id;
     private String artist;
     private String name;
     private String album;
