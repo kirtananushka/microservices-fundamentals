@@ -34,8 +34,16 @@ public class ResourceController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public ResponseEntity<byte[]> getResource(@PathVariable Integer id) {
+        byte[] audioData = resourceService.getResourceDataWithValidation(id);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(AUDIO_MPEG);
+        return ResponseEntity.ok().headers(headers).body(audioData);
+    }
+
+    @GetMapping(value = "/audiodata/{id}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    public ResponseEntity<byte[]> getAudiodata(@PathVariable Integer id) {
         byte[] audioData = resourceService.getResourceData(id);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(AUDIO_MPEG);

@@ -1,28 +1,27 @@
 package com.tananushka.song.svc.mapper;
 
+import com.tananushka.song.svc.dto.MetadataRequest;
+import com.tananushka.song.svc.dto.MetadataResponse;
 import com.tananushka.song.svc.dto.SongIdResponse;
-import com.tananushka.song.svc.dto.SongRequest;
-import com.tananushka.song.svc.dto.SongResponse;
 import com.tananushka.song.svc.entity.Song;
 import org.springframework.stereotype.Component;
 
 @Component
 public class SongMapper {
 
-    public Song toEntity(SongRequest songRequest) {
+    public Song toEntity(MetadataRequest metadataRequest) {
         Song song = new Song();
-        song.setResourceId(songRequest.getId());
-        song.setArtist(songRequest.getArtist());
-        song.setName(songRequest.getName());
-        song.setAlbum(songRequest.getAlbum());
-        song.setYear(songRequest.getYear());
-        song.setDuration(songRequest.getDuration());
+        song.setResourceId(metadataRequest.getId());
+        song.setArtist(metadataRequest.getArtist());
+        song.setName(metadataRequest.getName());
+        song.setAlbum(metadataRequest.getAlbum());
+        song.setYear(metadataRequest.getYear());
+        song.setDuration(metadataRequest.getDuration());
         return song;
     }
 
-    public SongResponse toResponse(Song song) {
-        SongResponse response = new SongResponse();
-        response.setId(Math.toIntExact(song.getId()));
+    public MetadataResponse toResponse(Song song) {
+        MetadataResponse response = new MetadataResponse();
         response.setName(song.getName());
         response.setArtist(song.getArtist());
         response.setAlbum(song.getAlbum());
@@ -34,7 +33,7 @@ public class SongMapper {
 
     public SongIdResponse toIdResponse(Song song) {
         SongIdResponse response = new SongIdResponse();
-        response.setId(Math.toIntExact(song.getId()));
+        response.setResourceId(Math.toIntExact(song.getResourceId()));
         return response;
     }
 }

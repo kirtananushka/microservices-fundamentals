@@ -1,0 +1,10 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="EurekaSvcApp" type="SpringBootApplicationConfigurationType"
+                 factoryName="Spring Boot" nameIsGenerated="true">
+    <module name="eureka-svc"/>
+    <option name="SPRING_BOOT_MAIN_CLASS" value="com.tananushka.eureka.svc.EurekaSvcApp"/>
+    <method v="2">
+      <option name="Make" enabled="true"/>
+    </method>
+  </configuration>
+</component>

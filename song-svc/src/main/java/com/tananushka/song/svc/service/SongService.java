@@ -1,8 +1,8 @@
 package com.tananushka.song.svc.service;
 
+import com.tananushka.song.svc.dto.MetadataRequest;
+import com.tananushka.song.svc.dto.MetadataResponse;
 import com.tananushka.song.svc.dto.SongIdResponse;
-import com.tananushka.song.svc.dto.SongRequest;
-import com.tananushka.song.svc.dto.SongResponse;
 import com.tananushka.song.svc.entity.Song;
 import com.tananushka.song.svc.exception.SongServiceException;
 import com.tananushka.song.svc.mapper.SongMapper;
@@ -25,19 +25,19 @@ public class SongService {
     private final SongRepository songRepository;
 
     @Transactional
-    public SongIdResponse save(SongRequest songRequest) {
-        Song song = songMapper.toEntity(songRequest);
+    public SongIdResponse save(MetadataRequest metadataRequest) {
+        Song song = songMapper.toEntity(metadataRequest);
         Song savedSong = songRepository.save(song);
         return songMapper.toIdResponse(savedSong);
     }
 
-    public SongResponse findByResourceId(Integer id) {
+    public MetadataResponse findByResourceId(Integer id) {
         validateSongExistence(id);
         return songRepository.findByResourceId(id).map(songMapper::toResponse)
                 .orElseThrow(() -> new SongServiceException("Unexpected error", "500"));
     }
 
-    public List<SongResponse> findAll() {
+    public List<MetadataResponse> findAll() {
         return songRepository.findAll().stream().map(songMapper::toResponse).toList();
     }
 

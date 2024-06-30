@@ -8,7 +8,6 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      #      - ./postgres_db_vol:/var/lib/postgresql/data
       - ./initdb:/docker-entrypoint-initdb.d
     restart: unless-stopped
 
@@ -23,3 +22,15 @@ services:
       - ./localstack-volume:/var/lib/localstack
       - /var/run/docker.sock:/var/run/docker.sock
     restart: unless-stopped
+
+  activemq:
+    image: apache/activemq-classic:6.1.1
+    container_name: activemq-server
+    restart: always
+    ports:
+      - "8161:8161"
+      - "61616:61616"
+    environment:
+      ACTIVEMQ_REMOVE_DEFAULT_ACCOUNTS: "true"
+      ACTIVEMQ_ADMIN_LOGIN: "admin"
+      ACTIVEMQ_ADMIN_PASSWORD: "admin"

@@ -1,17 +1,15 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="ResourceSvcApp" type="SpringBootApplicationConfigurationType"
+  <configuration default="false" name="ResourceProcApp" type="SpringBootApplicationConfigurationType"
                  factoryName="Spring Boot" nameIsGenerated="true">
     <envs>
-      <env name="DB_PASSWORD" value="1111"/>
-      <env name="DB_USERNAME" value="postgres"/>
       <env name="AWS_ACCESS_KEY" value="accessKey"/>
       <env name="AWS_SECRET_KEY" value="secretKey"/>
       <env name="ACTIVEMQ_USERNAME" value="admin"/>
       <env name="ACTIVEMQ_PASSWORD" value="admin"/>
     </envs>
     <option name="FRAME_DEACTIVATION_UPDATE_POLICY" value="UpdateClassesAndResources"/>
-    <module name="resource-svc"/>
-    <option name="SPRING_BOOT_MAIN_CLASS" value="com.tananushka.resource.svc.ResourceSvcApp"/>
+    <module name="resource-proc"/>
+    <option name="SPRING_BOOT_MAIN_CLASS" value="com.tananushka.resource.proc.ResourceProcApp"/>
     <method v="2">
       <option name="Make" enabled="true"/>
     </method>

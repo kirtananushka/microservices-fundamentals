@@ -9,5 +9,5 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class SongIdResponse {
 
-    private Integer id;
+    private Integer resourceId;
 }

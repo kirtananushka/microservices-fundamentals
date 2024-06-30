@@ -6,7 +6,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Data
-public class SongRequest {
+public class MetadataRequest {
 
     @Positive(message = "ID must be a positive number")
     private Integer id;

@@ -1,7 +1,6 @@
 package com.tananushka.resource.proc.service;
 
-import com.tananushka.resource.proc.client.SongClient;
-import com.tananushka.resource.proc.dto.SongRequest;
+import com.tananushka.resource.proc.dto.MetadataRequest;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tika.metadata.Metadata;
@@ -19,15 +18,7 @@ import java.io.InputStream;
 @Slf4j
 public class Mp3MetadataService {
 
-    private final SongClient songClient;
-
-    public void processMp3(byte[] mp3Data) {
-        Metadata metadata = extractMetadata(mp3Data);
-        SongRequest songRequest = createSongRequest(metadata);
-        songClient.saveMetadata(songRequest);
-    }
-
-    private Metadata extractMetadata(byte[] mp3Data) {
+    public Metadata extractMetadata(byte[] mp3Data) {
         BodyContentHandler handler = new BodyContentHandler();
         Metadata metadata = new Metadata();
         try (InputStream input = new ByteArrayInputStream(mp3Data)) {
@@ -38,13 +29,24 @@ public class Mp3MetadataService {
         return metadata;
     }
 
-    private SongRequest createSongRequest(Metadata metadata) {
-        SongRequest request = new SongRequest();
+    public MetadataRequest createSongRequest(Metadata metadata) {
+        MetadataRequest request = new MetadataRequest();
         request.setArtist(metadata.get("xmpDM:artist"));
         request.setName(metadata.get("title"));
         request.setAlbum(metadata.get("xmpDM:album"));
         request.setYear(metadata.get("xmpDM:releaseDate"));
-        request.setDuration(metadata.get("xmpDM:duration"));
+        request.setDuration(formatDuration(metadata.get("xmpDM:duration")));
         return request;
+    }
+
+    private String formatDuration(String durationInMilliseconds) {
+        if (durationInMilliseconds != null && !durationInMilliseconds.isEmpty()) {
+            double milliseconds = Double.parseDouble(durationInMilliseconds);
+            int totalSeconds = (int) (milliseconds / 1000);
+            int minutes = totalSeconds / 60;
+            int remainingSeconds = totalSeconds % 60;
+            return String.format("%02d:%02d", minutes, remainingSeconds);
+        }
+        return null;
     }
 }

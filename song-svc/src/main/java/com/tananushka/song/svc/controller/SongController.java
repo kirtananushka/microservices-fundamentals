@@ -1,11 +1,12 @@
 package com.tananushka.song.svc.controller;
 
+import com.tananushka.song.svc.dto.MetadataRequest;
+import com.tananushka.song.svc.dto.MetadataResponse;
 import com.tananushka.song.svc.dto.SongIdResponse;
-import com.tananushka.song.svc.dto.SongRequest;
-import com.tananushka.song.svc.dto.SongResponse;
 import com.tananushka.song.svc.service.SongService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,26 +24,28 @@ import java.util.Map;
 @RestController
 @RequestMapping("/songs")
 @AllArgsConstructor
+@Slf4j
 public class SongController {
 
     private final SongService songService;
 
     @PostMapping
-    public ResponseEntity<SongIdResponse> addSong(@Valid @RequestBody SongRequest songRequest) {
-        SongIdResponse response = songService.save(songRequest);
+    public ResponseEntity<SongIdResponse> addSong(@Valid @RequestBody MetadataRequest metadataRequest) {
+        SongIdResponse response = songService.save(metadataRequest);
+        log.info("Song saved: {}", response);
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<SongResponse> getSongByResourceId(@PathVariable Integer id) {
-        SongResponse songResponse = songService.findByResourceId(id);
-        return ResponseEntity.ok(songResponse);
+    public ResponseEntity<MetadataResponse> getSongByResourceId(@PathVariable Integer id) {
+        MetadataResponse metadataResponse = songService.findByResourceId(id);
+        return ResponseEntity.ok(metadataResponse);
     }
 
     @GetMapping
-    public ResponseEntity<List<SongResponse>> getAllSongs() {
-        List<SongResponse> songResponses = songService.findAll();
-        return ResponseEntity.ok(songResponses);
+    public ResponseEntity<List<MetadataResponse>> getAllSongs() {
+        List<MetadataResponse> metadataResponses = songService.findAll();
+        return ResponseEntity.ok(metadataResponses);
     }
 
     @DeleteMapping
