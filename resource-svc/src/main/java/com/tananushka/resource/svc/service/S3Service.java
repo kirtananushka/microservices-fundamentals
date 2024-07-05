@@ -34,7 +34,7 @@ public class S3Service {
             s3Client.putObject(putObjectRequest, software.amazon.awssdk.core.sync.RequestBody.fromFile(file));
             return "s3://" + awsProperties.getS3().getBucket() + "/" + key;
         } catch (IOException e) {
-            throw new RuntimeException("Failed to upload file to S3", e);
+            throw new ResourceServiceException("Failed to upload file to S3", "500");
         }
     }
 

@@ -6,7 +6,7 @@ logging:
     com.tananushka.song.svc: info
 spring:
   application:
-    name: song-svc
+    name: "song-svc"
   datasource:
     url: "jdbc:postgresql://${DB_HOST:localhost}:5432/song_svc_db"
     username: "${DB_USERNAME}"

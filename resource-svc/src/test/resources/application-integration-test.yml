@@ -1,0 +1,13 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: update
+cloud:
+  aws:
+    s3:
+      bucket: "test-bucket"
+queue:
+  resource: "resource.queue"
+eureka:
+  client:
+    enabled: false

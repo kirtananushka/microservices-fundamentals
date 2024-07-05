@@ -1,7 +1,7 @@
 package com.tananushka.resource.proc.service;
 
 import com.tananushka.resource.proc.dto.MetadataRequest;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.parser.ParseContext;
@@ -14,15 +14,16 @@ import java.io.IOException;
 import java.io.InputStream;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Slf4j
 public class Mp3MetadataService {
+    private final Mp3Parser mp3Parser;
 
     public Metadata extractMetadata(byte[] mp3Data) {
         BodyContentHandler handler = new BodyContentHandler();
         Metadata metadata = new Metadata();
         try (InputStream input = new ByteArrayInputStream(mp3Data)) {
-            new Mp3Parser().parse(input, handler, metadata, new ParseContext());
+            mp3Parser.parse(input, handler, metadata, new ParseContext());
         } catch (IOException | org.xml.sax.SAXException | org.apache.tika.exception.TikaException e) {
             log.error("Failed to extract metadata", e);
         }

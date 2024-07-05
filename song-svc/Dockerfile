@@ -5,9 +5,9 @@ RUN mvn dependency:go-offline
 COPY src/ ./src/
 RUN mvn clean package -DskipTests
 
-FROM mcr.microsoft.com/openjdk/jdk:17-ubuntu AS package
+FROM openjdk:17-alpine AS package
 WORKDIR /app
-RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
+RUN apk update && apk add --no-cache curl
 COPY --from=build /app/target/song-svc-0.0.1-SNAPSHOT.jar app.jar
 EXPOSE 8072
 CMD ["java", "-jar", "app.jar"]

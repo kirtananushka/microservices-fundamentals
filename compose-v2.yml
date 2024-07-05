@@ -1,0 +1,154 @@
+version: '3.9'
+services:
+  postgres:
+    image: postgres:alpine
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./initdb:/docker-entrypoint-initdb.d
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-U", "postgres" ]
+      interval: 10s
+      timeout: 10s
+      retries: 20
+
+  localstack:
+    image: localstack/localstack
+    ports:
+      - "4566:4566"
+    environment:
+      - SERVICES=s3
+      - AWS_DEFAULT_REGION=us-east-1
+    volumes:
+      - ./localstack-volume:/var/lib/localstack
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD-SHELL", "awslocal s3 ls || exit 1" ]
+      interval: 10s
+      timeout: 10s
+      retries: 20
+  
+  activemq:
+    image: apache/activemq-classic:6.1.1
+    container_name: activemq-server
+    restart: unless-stopped
+    ports:
+      - "8161:8161"
+      - "61616:61616"
+    environment:
+      ACTIVEMQ_REMOVE_DEFAULT_ACCOUNTS: "true"
+      ACTIVEMQ_ADMIN_LOGIN: "admin"
+      ACTIVEMQ_ADMIN_PASSWORD: "admin"
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -sf http://localhost:8161 | grep -q 'ActiveMQ'" ]
+      interval: 10s
+      timeout: 10s
+      retries: 20
+
+  eureka-server:
+    build:
+      context: ./eureka-svc
+      dockerfile: Dockerfile-v2
+    image: eureka-server
+    environment:
+      HOSTNAME: eureka-server
+    ports:
+      - "8761:8761"
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://eureka-server:8761/eureka-svc/health" ]
+      interval: 10s
+      timeout: 10s
+      retries: 20
+
+  song-svc:
+    build:
+      context: ./song-svc
+      dockerfile: Dockerfile-v2
+    image: song-svc
+    environment:
+      DB_HOST: postgres
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      EUREKA_HOST: eureka-server
+    ports:
+      - "8072:8072"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://song-svc:8072/song-svc/health" ]
+      interval: 10s
+      timeout: 10s
+      retries: 20
+
+  resource-svc:
+    build:
+      context: ./resource-svc
+      dockerfile: Dockerfile-v2
+    image: resource-svc
+    environment:
+      DB_HOST: postgres
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      EUREKA_HOST: eureka-server
+      AWS_ENDPOINT_URL: http://localstack:4566
+      AWS_ACCESS_KEY: ${AWS_ACCESS_KEY}
+      AWS_SECRET_KEY: ${AWS_SECRET_KEY}
+      ACTIVEMQ_HOST: activemq
+      ACTIVEMQ_USERNAME: ${ACTIVEMQ_USERNAME}
+      ACTIVEMQ_PASSWORD: ${ACTIVEMQ_PASSWORD}
+    ports:
+      - "8071:8071"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      song-svc:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+      localstack:
+        condition: service_healthy
+      activemq:
+        condition: service_started
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://resource-svc:8071/resource-svc/health" ]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+
+  resource-proc:
+    build:
+      context: ./resource-proc
+      dockerfile: Dockerfile-v2
+    image: resource-proc
+    environment:
+      EUREKA_HOST: eureka-server
+      ACTIVEMQ_HOST: activemq
+      ACTIVEMQ_USERNAME: ${ACTIVEMQ_USERNAME}
+      ACTIVEMQ_PASSWORD: ${ACTIVEMQ_PASSWORD}
+    ports:
+      - "8073:8073"
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+      activemq:
+        condition: service_started
+      resource-svc:
+        condition: service_healthy
+      song-svc:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://resource-proc:8073/resource-proc/health" ]
+      interval: 10s
+      timeout: 10s
+      retries: 10
