@@ -1,0 +1,12 @@
+svc:
+  song-svc:
+    name: "song-svc"
+    url: "http://localhost:${wiremock.server.port}"
+    songs-endpoint: "/songs"
+spring:
+  main:
+    allow-bean-definition-overriding: true
+  activemq:
+    broker-url: "tcp://localhost:61616"
+    user: "test_user"
+    password: "test_password"

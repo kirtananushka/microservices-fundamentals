@@ -1,0 +1,26 @@
+spring:
+  main:
+    allow-bean-definition-overriding: true
+  activemq:
+    broker-url: "vm://localhost?broker.persistent=false"
+    user: "test_user"
+    password: "test_password"
+
+eureka:
+  client:
+    enabled: false
+
+svc:
+  song-svc:
+    name: "SONG-SVC"
+    songs-endpoint: "/songs"
+    health-endpoint: "/song-svc/health"
+  resource-svc:
+    name: "RESOURCE-SVC"
+    resources-endpoint: "/resources/audiodata"
+    health-endpoint: "/resource-svc/health"
+
+retry:
+  maxAttempts: 3
+  delay: 1000
+  multiplier: 2.0

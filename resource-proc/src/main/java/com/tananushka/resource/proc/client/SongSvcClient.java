@@ -9,7 +9,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-@FeignClient(name = "${svc.song-svc.name}", fallback = SongSvcClient.SongClientFallback.class)
+@FeignClient(
+        name = "${svc.song-svc.name}",
+        fallback = SongSvcClient.SongClientFallback.class
+)
 public interface SongSvcClient {
     @PostMapping("${svc.song-svc.songs-endpoint}")
     SongIdResponse saveMetadata(@RequestBody MetadataRequest metadataRequest);

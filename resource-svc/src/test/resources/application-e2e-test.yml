@@ -1,0 +1,63 @@
+server:
+  port: 8071
+logging:
+  level:
+    root: WARN
+    com.tananushka.resource.svc: INFO
+    com.tananushka.resource.svc.service.ResourceService: DEBUG
+spring:
+  application:
+    name: "resource-svc"
+  datasource:
+    url: "jdbc:postgresql://${DB_HOST:localhost}:5432/resource_svc_db"
+    username: "${DB_USERNAME:postgres}"
+    password: "${DB_PASSWORD:1111}"
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  activemq:
+    broker-url: "tcp://${ACTIVEMQ_HOST:localhost}:61616"
+    user: "${ACTIVEMQ_USERNAME:admin}"
+    password: "${ACTIVEMQ_PASSWORD:admin}"
+queue:
+  resource: "resource.queue"
+svc:
+  song-svc:
+    name: "SONG-SVC"
+    songs-endpoint: "/songs"
+    health-endpoint: "/song-svc/health"
+eureka:
+  instance:
+    leaseRenewalIntervalInSeconds: 10
+    leaseExpirationDurationInSeconds: 30
+  client:
+    serviceUrl:
+      defaultZone: "http://${EUREKA_HOST:localhost}:8761/eureka/"
+management:
+  endpoint:
+    health:
+      show-details: always
+      group:
+        custom:
+          include: db, externalApi
+  endpoints:
+    web:
+      exposure:
+        include: health, info
+      base-path: /
+      path-mapping:
+        health: resource-svc/health
+cloud:
+  aws:
+    endpoint: "${AWS_ENDPOINT_URL:http://localhost:4566}"
+    region: us-east-1
+    s3:
+      bucket: resource-bucket
+    credentials:
+      accessKey: "${AWS_ACCESS_KEY}"
+      secretKey: "${AWS_SECRET_KEY}"
+retry:
+  maxAttempts: 10
+  delay: 1000
+  multiplier: 2.0
