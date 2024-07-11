@@ -8,6 +8,6 @@ RUN mvn clean package -DskipTests
 FROM openjdk:17-alpine AS package
 WORKDIR /app
 RUN apk update && apk add --no-cache curl
-COPY --from=build /app/target/resource-svc-0.0.1-SNAPSHOT.jar app.jar
+COPY --from=build /app/target/*.jar app.jar
 EXPOSE 8071
 CMD ["java", "-jar", "app.jar"]
