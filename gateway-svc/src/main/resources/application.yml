@@ -1,0 +1,38 @@
+server:
+  port: 8070
+
+spring:
+  application:
+    name: "gateway-svc"
+  cloud:
+    gateway:
+      routes:
+        - id: resource-service
+          uri: lb://resource-svc
+          predicates:
+            - Path=/resources/**
+        - id: song-service
+          uri: lb://song-svc
+          predicates:
+            - Path=/songs/**
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: "http://${EUREKA_HOST:localhost}:8761/eureka/"
+  instance:
+    leaseRenewalIntervalInSeconds: 10
+    leaseExpirationDurationInSeconds: 30
+
+management:
+  endpoint:
+    health:
+      show-details: always
+  endpoints:
+    web:
+      exposure:
+        include: health, info
+      base-path: /
+      path-mapping:
+        health: gateway-svc/health
+
