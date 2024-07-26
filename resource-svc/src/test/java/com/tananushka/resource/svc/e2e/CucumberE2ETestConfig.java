@@ -23,7 +23,6 @@ public class CucumberE2ETestConfig {
                 .url(env.getProperty("spring.datasource.url"))
                 .username(env.getProperty("spring.datasource.username"))
                 .password(env.getProperty("spring.datasource.password"))
-                .driverClassName(env.getProperty("spring.datasource.driver-class-name"))
                 .build();
     }
 

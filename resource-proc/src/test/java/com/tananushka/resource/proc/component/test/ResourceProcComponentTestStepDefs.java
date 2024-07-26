@@ -12,10 +12,12 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import io.cucumber.spring.CucumberContextConfiguration;
+import jakarta.ws.rs.core.MediaType;
 import org.apache.tika.metadata.Metadata;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 
@@ -26,6 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.http.MediaType.valueOf;
 
 @CucumberContextConfiguration
 @SpringBootTest
@@ -50,7 +53,11 @@ public class ResourceProcComponentTestStepDefs {
     @Given("a new resource with ID {int} is available")
     public void a_new_resource_with_id_is_available(Integer id) {
         byte[] dummyAudioData = "dummy audio data".getBytes();
-        when(resourceSvcClient.getAudioData(id)).thenReturn(dummyAudioData);
+        ResponseEntity<byte[]> mockResponse = ResponseEntity
+                .ok()
+                .contentType(valueOf(MediaType.APPLICATION_OCTET_STREAM))
+                .body(dummyAudioData);
+        when(resourceSvcClient.getAudioData(id)).thenReturn(mockResponse);
 
         Metadata dummyMetadata = new Metadata();
         dummyMetadata.set("title", "Test Song");

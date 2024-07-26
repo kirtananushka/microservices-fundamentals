@@ -18,6 +18,7 @@
     <spring-cloud.version>2023.0.2</spring-cloud.version>
     <tika.version>1.5</tika.version>
     <s3.version>2.26.7</s3.version>
+    <httpclient.version>4.5.14</httpclient.version>
     <cucumber.version>7.18.0</cucumber.version>
     <wiremock.version>3.8.0</wiremock.version>
   </properties>
@@ -67,10 +68,13 @@
       <artifactId>spring-cloud-starter-openfeign</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.springframework.cloud</groupId>
+      <artifactId>spring-cloud-starter-circuitbreaker-resilience4j</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.springframework.retry</groupId>
       <artifactId>spring-retry</artifactId>
     </dependency>
-
     <dependency>
       <groupId>org.postgresql</groupId>
       <artifactId>postgresql</artifactId>
@@ -99,7 +103,6 @@
     <dependency>
       <groupId>org.testcontainers</groupId>
       <artifactId>localstack</artifactId>
-      <!--      <version>1.17.3</version>-->
     </dependency>
 
     <!-- Test dependencies -->
@@ -169,6 +172,11 @@
       <artifactId>junit-jupiter</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <dependencyManagement>
@@ -186,6 +194,11 @@
         <version>${cucumber.version}</version>
         <type>pom</type>
         <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.httpcomponents</groupId>
+        <artifactId>httpclient</artifactId>
+        <version>${httpclient.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

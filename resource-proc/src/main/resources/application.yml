@@ -3,9 +3,9 @@ server:
 logging:
   level:
     root: info
-    org.springframework.retry: debug
+    org.springframework.retry: info
     com.tananushka.resource.proc.service: info
-    com.tananushka.resource.proc.service.ResourceProcessorService: debug
+    com.tananushka.resource.proc.service.ResourceProcessorService: info
 spring:
   application:
     name: "resource-proc"
@@ -26,8 +26,8 @@ svc:
     health-endpoint: "/resource-svc/health"
 eureka:
   instance:
-    leaseRenewalIntervalInSeconds: 10
-    leaseExpirationDurationInSeconds: 30
+    leaseRenewalIntervalInSeconds: 5
+    leaseExpirationDurationInSeconds: 5
   client:
     serviceUrl:
       defaultZone: "http://${EUREKA_HOST:localhost}:8761/eureka/"

@@ -1,0 +1,38 @@
+server:
+  port: 8074
+logging:
+  level:
+    root: WARN
+    com.tananushka.storage.svc: INFO
+spring:
+  application:
+    name: "storage-svc"
+  datasource:
+    url: "jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5474}/storage_svc_db"
+    username: "${DB_USERNAME}"
+    password: "${DB_PASSWORD}"
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+  sql:
+    init:
+      mode: always
+eureka:
+  instance:
+    leaseRenewalIntervalInSeconds: 5
+    leaseExpirationDurationInSeconds: 5
+  client:
+    serviceUrl:
+      defaultZone: "http://${EUREKA_HOST:localhost}:8761/eureka/"
+management:
+  endpoint:
+    health:
+      show-details: always
+  endpoints:
+    web:
+      exposure:
+        include: health, info
+      base-path: /
+      path-mapping:
+        health: storage-svc/health

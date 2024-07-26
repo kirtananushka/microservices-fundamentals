@@ -13,6 +13,8 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.retry.support.RetryTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.concurrent.TimeUnit;
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -34,7 +36,8 @@ public class ResourceProcessorService {
     public void processResource(Long resourceId) {
         log.debug("Received new resourceId={}", resourceId);
         try {
-            byte[] audioData = resourceSvcClient.getAudioData(Math.toIntExact(resourceId));
+            TimeUnit.SECONDS.sleep(2);
+            byte[] audioData = resourceSvcClient.getAudioData(Math.toIntExact(resourceId)).getBody();
             Metadata metadata = mp3MetadataService.extractMetadata(audioData);
             MetadataRequest metadataRequest = mp3MetadataService.createSongRequest(metadata);
             metadataRequest.setId(Math.toIntExact(resourceId));
@@ -44,6 +47,9 @@ public class ResourceProcessorService {
                 return null;
             });
             log.debug("Saved metadata for resourceId={} to the Song Service", resourceId);
+        } catch (InterruptedException e) {
+            log.error("Interrupted while waiting before processing resourceId={}", resourceId, e);
+            Thread.currentThread().interrupt();
         } catch (Exception e) {
             log.error("Error occurred while processing resourceId={}: {}", resourceId, e.getMessage());
             throw new ResourceProcessorException("Failed to process resourceId=" + resourceId, "500");

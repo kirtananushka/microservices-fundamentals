@@ -12,6 +12,7 @@ public class ExternalApiHealthIndicator implements HealthIndicator {
 
     private final SongSvcClient songSvcClient;
 
+    // fixme add health check for storage service
     @Override
     public Health health() {
         try {

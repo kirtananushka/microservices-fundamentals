@@ -8,19 +8,17 @@ import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.S3Configuration;
-import software.amazon.awssdk.services.s3.model.CreateBucketRequest;
 
 import java.net.URI;
 
 @Configuration
 @RequiredArgsConstructor
 public class S3Config {
-
     private final AwsProperties awsProperties;
 
     @Bean
     public S3Client s3Client() {
-        S3Client s3Client = S3Client.builder()
+        return S3Client.builder()
                 .endpointOverride(URI.create(awsProperties.getEndpoint()))
                 .region(Region.of(awsProperties.getRegion()))
                 .credentialsProvider(StaticCredentialsProvider.create(
@@ -29,9 +27,5 @@ public class S3Config {
                                 awsProperties.getCredentials().getSecretKey())))
                 .serviceConfiguration(S3Configuration.builder().pathStyleAccessEnabled(true).build())
                 .build();
-
-        s3Client.createBucket(CreateBucketRequest.builder().bucket(awsProperties.getS3().getBucket()).build());
-
-        return s3Client;
     }
 }

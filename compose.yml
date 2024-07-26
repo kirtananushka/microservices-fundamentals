@@ -1,14 +1,14 @@
 version: '3.9'
 services:
-  postgres:
+  resource-svc-db: &postgres
     image: postgres:16.3-alpine3.20
-    container_name: postgres
+    container_name: resource-svc-db
     environment:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
-      - "5432:5432"  # Postgres is used internally and its port is exposed
+      - "5471:5432"
     volumes:
-      - ./initdb:/docker-entrypoint-initdb.d
+      - ./initdb/resource-svc:/docker-entrypoint-initdb.d
     healthcheck:
       test: [ "CMD", "pg_isready", "-U", "postgres" ]
       interval: 10s
@@ -16,6 +16,22 @@ services:
       retries: 20
     networks:
       - internal
+
+  song-svc-db:
+    <<: *postgres
+    container_name: song-svc-db
+    ports:
+      - "5472:5432"
+    volumes:
+      - ./initdb/song-svc:/docker-entrypoint-initdb.d
+
+  storage-svc-db:
+    <<: *postgres
+    container_name: storage-svc-db
+    ports:
+      - "5474:5432"
+    volumes:
+      - ./initdb/storage-svc:/docker-entrypoint-initdb.d
 
   localstack:
     image: localstack/localstack
@@ -95,14 +111,15 @@ services:
     image: mf-song-svc
     container_name: song-svc
     environment:
-      DB_HOST: ${DB_HOST}
+      DB_HOST: song-svc-db
+      DB_PORT: ${DB_PORT}
       DB_USERNAME: ${DB_USERNAME}
       DB_PASSWORD: ${DB_PASSWORD}
       EUREKA_HOST: ${EUREKA_HOST}
     #    ports:
     #      - "8072:8072"
     depends_on:
-      postgres:
+      song-svc-db:
         condition: service_healthy
       eureka-server:
         condition: service_healthy
@@ -114,12 +131,38 @@ services:
     networks:
       - internal
 
+  storage-svc:
+    build: ./storage-svc
+    image: mf-storage-svc
+    container_name: storage-svc
+    environment:
+      DB_HOST: storage-svc-db
+      DB_PORT: ${DB_PORT}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      EUREKA_HOST: ${EUREKA_HOST}
+    #    ports:
+    #      - "8074:8074"
+    depends_on:
+      storage-svc-db:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://storage-svc:8074/storage-svc/health" ]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+    networks:
+      - internal
+
   resource-svc:
     build: ./resource-svc
     image: mf-resource-svc
     container_name: resource-svc
     environment:
-      DB_HOST: ${DB_HOST}
+      DB_HOST: resource-svc-db
+      DB_PORT: ${DB_PORT}
       DB_USERNAME: ${DB_USERNAME}
       DB_PASSWORD: ${DB_PASSWORD}
       EUREKA_HOST: ${EUREKA_HOST}
@@ -132,9 +175,11 @@ services:
     #    ports:
     #      - "8071:8071"
     depends_on:
-      postgres:
+      resource-svc-db:
         condition: service_healthy
       song-svc:
+        condition: service_healthy
+      storage-svc:
         condition: service_healthy
       eureka-server:
         condition: service_healthy
@@ -177,6 +222,8 @@ services:
       retries: 10
     networks:
       - internal
+
+
 
 networks:
   internal:

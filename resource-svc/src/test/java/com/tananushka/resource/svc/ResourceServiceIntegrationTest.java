@@ -3,6 +3,7 @@ package com.tananushka.resource.svc;
 import com.tananushka.resource.svc.dto.ResourceResponse;
 import com.tananushka.resource.svc.repository.ResourceRepository;
 import com.tananushka.resource.svc.service.ResourceService;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -90,15 +91,20 @@ public class ResourceServiceIntegrationTest {
     }
 
     @Test
-    void testSaveAndRetrieveResource() throws IOException {
+    void testSaveAndRetrieveResource() {
         // Save resource
         ResourceResponse saveResponse = resourceService.saveResource(testAudioData);
         assertThat(saveResponse).isNotNull();
-        assertThat(saveResponse.getS3Url()).startsWith("s3://test-bucket/");
+        assertThat(saveResponse.getS3Location()).startsWith("s3://fallback-permanent-bucket/files/");
 
         // Retrieve resource
         byte[] retrievedAudioData = resourceService.getResourceData(saveResponse.getId());
         assertThat(retrievedAudioData).isNotNull();
         assertThat(retrievedAudioData).isEqualTo(testAudioData);
+    }
+
+    @Test
+    void testGetResourceDataWithExceptionToTestSucceedsAfterRetries() {
+        Assertions.assertTrue(resourceService.getResourceDataWithExceptionToTestRetry(1));
     }
 }

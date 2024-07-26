@@ -12,14 +12,7 @@ import org.springframework.context.annotation.Configuration;
 public class AwsProperties {
     private String endpoint;
     private String region;
-    private S3Properties s3;
     private Credentials credentials;
-
-    @Getter
-    @Setter
-    public static class S3Properties {
-        private String bucket;
-    }
 
     @Getter
     @Setter

@@ -1,0 +1,15 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="StorageSvcApp" type="SpringBootApplicationConfigurationType"
+                 factoryName="Spring Boot" nameIsGenerated="true">
+    <envs>
+      <env name="DB_PASSWORD" value="postgres"/>
+      <env name="DB_USERNAME" value="postgres"/>
+    </envs>
+    <option name="FRAME_DEACTIVATION_UPDATE_POLICY" value="UpdateClassesAndResources"/>
+    <module name="storage-svc"/>
+    <option name="SPRING_BOOT_MAIN_CLASS" value="com.tananushka.storage.svc.StorageSvcApp"/>
+    <method v="2">
+      <option name="Make" enabled="true"/>
+    </method>
+  </configuration>
+</component>

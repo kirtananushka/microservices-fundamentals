@@ -4,22 +4,24 @@ logging:
   level:
     root: WARN
     com.tananushka.resource.svc: INFO
-    com.tananushka.resource.svc.service.ResourceService: DEBUG
+    com.tananushka.resource.svc.service.ResourceService: INFO
 spring:
   application:
     name: "resource-svc"
   datasource:
-    url: "jdbc:postgresql://${DB_HOST:localhost}:5432/resource_svc_db"
+    url: "jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5471}/resource_svc_db"
     username: "${DB_USERNAME:postgres}"
-    password: "${DB_PASSWORD:1111}"
+    password: "${DB_PASSWORD:postgres}"
   jpa:
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: false
   activemq:
     broker-url: "tcp://${ACTIVEMQ_HOST:localhost}:61616"
     user: "${ACTIVEMQ_USERNAME:admin}"
     password: "${ACTIVEMQ_PASSWORD:admin}"
+  cloud:
+    openfeign:
+      circuitbreaker:
+        enabled: true
 queue:
   resource: "resource.queue"
 svc:
@@ -27,10 +29,14 @@ svc:
     name: "SONG-SVC"
     songs-endpoint: "/songs"
     health-endpoint: "/song-svc/health"
+  storage-svc:
+    name: "STORAGE-SVC"
+    storages-endpoint: "/storages"
+    health-endpoint: "/storage-svc/health"
 eureka:
   instance:
-    leaseRenewalIntervalInSeconds: 10
-    leaseExpirationDurationInSeconds: 30
+    leaseRenewalIntervalInSeconds: 5 # Time between heartbeats
+    leaseExpirationDurationInSeconds: 5 # Time before lease expires
   client:
     serviceUrl:
       defaultZone: "http://${EUREKA_HOST:localhost}:8761/eureka/"
@@ -52,12 +58,24 @@ cloud:
   aws:
     endpoint: "${AWS_ENDPOINT_URL:http://localhost:4566}"
     region: us-east-1
-    s3:
-      bucket: resource-bucket
     credentials:
-      accessKey: "${AWS_ACCESS_KEY}"
-      secretKey: "${AWS_SECRET_KEY}"
+      accessKey: "${AWS_ACCESS_KEY:accesskey}"
+      secretKey: "${AWS_SECRET_KEY:secretkey}"
 retry:
   maxAttempts: 10
   delay: 1000
   multiplier: 2.0
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        registerHealthIndicator: true  # Enable health indicators for monitoring
+        slidingWindowSize: 5  # Number of calls considered for circuit breaker decisions
+        failureRateThreshold: 30  # Percentage of failures required to open the circuit
+        waitDurationInOpenState: 5s  # Time the circuit stays open before moving to half-open
+        permittedNumberOfCallsInHalfOpenState: 2  # Number of calls allowed in half-open state
+        slidingWindowType: COUNT_BASED  # Type of sliding window (COUNT_BASED or TIME_BASED)
+        minimumNumberOfCalls: 5  # Minimum number of calls required before calculating error rate
+    instances:
+      storageSvcClient:
+        baseConfig: default

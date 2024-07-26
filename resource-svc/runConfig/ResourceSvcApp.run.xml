@@ -2,7 +2,7 @@
   <configuration default="false" name="ResourceSvcApp" type="SpringBootApplicationConfigurationType"
                  factoryName="Spring Boot" nameIsGenerated="true">
     <envs>
-      <env name="DB_PASSWORD" value="1111"/>
+      <env name="DB_PASSWORD" value="postgres"/>
       <env name="DB_USERNAME" value="postgres"/>
       <env name="AWS_ACCESS_KEY" value="accessKey"/>
       <env name="AWS_SECRET_KEY" value="secretKey"/>
@@ -12,6 +12,11 @@
     <option name="FRAME_DEACTIVATION_UPDATE_POLICY" value="UpdateClassesAndResources"/>
     <module name="resource-svc"/>
     <option name="SPRING_BOOT_MAIN_CLASS" value="com.tananushka.resource.svc.ResourceSvcApp"/>
+    <extension name="software.aws.toolkits.jetbrains.core.execution.JavaAwsConnectionExtension">
+      <option name="credential"/>
+      <option name="region"/>
+      <option name="useCurrentConnection" value="false"/>
+    </extension>
     <method v="2">
       <option name="Make" enabled="true"/>
     </method>

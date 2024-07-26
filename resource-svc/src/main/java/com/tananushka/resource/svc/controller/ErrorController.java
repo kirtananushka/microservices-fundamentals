@@ -16,8 +16,14 @@ public class ErrorController {
     @ExceptionHandler(ResourceServiceException.class)
     public ResponseEntity<ErrorDto> resourceServiceExceptionHandler(ResourceServiceException e) {
         ErrorDto errorDto = new ErrorDto(e.getMessage(), e.getErrorCode());
-        HttpStatus httpStatus = determineHttpStatus(e.getErrorCode());
-        logError(errorDto, e);
+        HttpStatus httpStatus;
+        if (e.getErrorCode().length() >= 4) {
+            logError(errorDto, null);
+            httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+        } else {
+            logError(errorDto, e);
+            httpStatus = determineHttpStatus(e.getErrorCode());
+        }
         return new ResponseEntity<>(errorDto, httpStatus);
     }
 
@@ -43,7 +49,7 @@ public class ErrorController {
     }
 
     private void logError(ErrorDto errorDto, Throwable throwable) {
-        String message = throwable.getCause() != null ?
+        String message = throwable != null && throwable.getCause() != null ?
                 String.format("Error occurred: errorMessage=%s, errorCode=%s, causeMessage=%s", errorDto.errorMessage(),
                         errorDto.errorCode(), throwable.getCause().getMessage()) :
                 String.format("Error occurred: errorMessage=%s, errorCode=%s", errorDto.errorMessage(),

@@ -22,4 +22,7 @@ public class Resource {
 
     @Column(name = "s3_location", nullable = false)
     private String s3Location;
+
+    @Column(name = "storage_type", nullable = false)
+    private String storageType;
 }

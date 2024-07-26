@@ -3,11 +3,16 @@
                  factoryName="Spring Boot" nameIsGenerated="true">
     <envs>
       <env name="DB_USERNAME" value="postgres"/>
-      <env name="DB_PASSWORD" value="1111"/>
+      <env name="DB_PASSWORD" value="postgres"/>
     </envs>
     <option name="FRAME_DEACTIVATION_UPDATE_POLICY" value="UpdateClassesAndResources"/>
     <module name="song-svc"/>
     <option name="SPRING_BOOT_MAIN_CLASS" value="com.tananushka.song.svc.SongSvcApp"/>
+    <extension name="software.aws.toolkits.jetbrains.core.execution.JavaAwsConnectionExtension">
+      <option name="credential"/>
+      <option name="region"/>
+      <option name="useCurrentConnection" value="false"/>
+    </extension>
     <method v="2">
       <option name="Make" enabled="true"/>
     </method>

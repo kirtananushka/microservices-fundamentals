@@ -31,8 +31,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @CucumberContextConfiguration
 @ActiveProfiles("e2e-test")
 public class CucumberE2EStepDefs {
+    // use 8070 for gateway api    
+    private final String baseUrl = "http://localhost:8070/resources";
 
-    private final String baseUrl = "http://localhost:8071/resources";
     @Autowired
     private TestRestTemplate restTemplate;
     private ResponseEntity<String> response;
@@ -63,9 +64,11 @@ public class CucumberE2EStepDefs {
         ObjectMapper mapper = new ObjectMapper();
         JsonNode jsonResponse = mapper.readTree(response.getBody());
         assertTrue(jsonResponse.has("id"));
-        assertTrue(jsonResponse.has("s3Url"));
+        assertTrue(jsonResponse.has("s3Location"));
+        assertTrue(jsonResponse.has("storageType"));
         assertTrue(jsonResponse.get("id").isInt());
-        assertTrue(jsonResponse.get("s3Url").isTextual());
+        assertTrue(jsonResponse.get("s3Location").isTextual());
+        assertTrue(jsonResponse.get("storageType").isTextual());
         existingResourceId = jsonResponse.get("id").asInt();
     }
 

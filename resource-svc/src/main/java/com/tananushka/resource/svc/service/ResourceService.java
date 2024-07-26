@@ -1,7 +1,9 @@
 package com.tananushka.resource.svc.service;
 
 import com.tananushka.resource.svc.client.SongSvcClient;
+import com.tananushka.resource.svc.client.StorageSvcClient;
 import com.tananushka.resource.svc.dto.ResourceResponse;
+import com.tananushka.resource.svc.dto.Storage;
 import com.tananushka.resource.svc.entity.Resource;
 import com.tananushka.resource.svc.exception.ResourceServiceException;
 import com.tananushka.resource.svc.mapper.ResourceMapper;
@@ -18,35 +20,54 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
 @RequiredArgsConstructor
 @Service
 @Slf4j
 public class ResourceService {
+    private static final String PERMANENT = "PERMANENT";
+    private static final String STAGING = "STAGING";
     private final ResourceMapper resourceMapper;
     private final ResourceRepository resourceRepository;
     private final SongSvcClient songSvcClient;
     private final S3Service s3Service;
     private final JmsTemplate jmsTemplate;
+    private final StorageSvcClient storageSvcClient;
 
     @Value("${queue.resource}")
     private String resourceQueue;
 
+    private final AtomicInteger getResourceDataTestCounter = new AtomicInteger(0);
+
     @Transactional
     public ResourceResponse saveResource(byte[] audioData) {
+        log.debug("Starting saveResource with audio data of length: {}", audioData.length);
         validateAudioData(audioData);
-        Resource savedResource = createResourceRecord();
-        String s3Location;
-        try {
-            s3Location = s3Service.uploadToS3(audioData);
-            savedResource.setS3Location(s3Location);
-            resourceRepository.save(savedResource);
-        } catch (Exception e) {
-            throw new ResourceServiceException("Failed to upload file to S3", "500", e);
-        }
-        sendMessage(savedResource.getId());
-        return resourceMapper.toResponse(savedResource.getId(), s3Location);
+
+        // Fetch the storage type from the service
+        Storage stagingStorage = getStorageByType(STAGING);
+        String stagingS3Location = s3Service.uploadToS3(audioData, stagingStorage);
+
+        // Create resource record with staging storage type
+        Resource savedResource = createResourceRecord(stagingS3Location, STAGING);
+        resourceRepository.save(savedResource);
+
+        log.info("Resource saved with ID: {} and {} S3 location: {}", savedResource.getId(), STAGING, stagingS3Location);
+
+        Long resourceId = savedResource.getId();
+        sendMessage(resourceId);
+
+        // Move to permanent storage
+        String permanentS3Location = moveToPermanentStorage(resourceId);
+        savedResource.setS3Location(permanentS3Location);
+        savedResource.setStorageType(PERMANENT);
+        resourceRepository.save(savedResource);
+
+        log.info("Resource updated with {} S3 location: {}", PERMANENT, permanentS3Location);
+
+        return resourceMapper.toResponse(savedResource);
     }
 
     @Retryable(retryFor = {Exception.class}, maxAttemptsExpression = "#{${retry.maxAttempts}}", backoff = @Backoff(delayExpression = "#{${retry.delay}}", multiplierExpression = "#{${retry.multiplier}}"))
@@ -64,9 +85,11 @@ public class ResourceService {
         });
     }
 
+    @Retryable(retryFor = {Exception.class}, maxAttemptsExpression = "#{${retry.maxAttempts}}", backoff = @Backoff(delayExpression = "#{${retry.delay}}", multiplierExpression = "#{${retry.multiplier}}"))
     public byte[] getResourceData(Integer id) {
-        String s3Location = resourceRepository.findById(Long.valueOf(id)).orElseThrow(() -> new ResourceServiceException("Unexpected error", "500")).getS3Location();
-        return s3Service.downloadFromS3(s3Location);
+        Resource resource = resourceRepository.findById(Long.valueOf(id))
+                .orElseThrow(() -> new ResourceServiceException("File is not ready yet", "5001"));
+        return s3Service.downloadFromS3(resource.getS3Location());
     }
 
     public byte[] getResourceDataWithValidation(Integer id) {
@@ -76,8 +99,9 @@ public class ResourceService {
 
     public List<ResourceResponse> findAll() {
         return resourceRepository.findAllIds().stream().map(resourceId -> {
-            String s3Location = resourceRepository.findById(resourceId).orElseThrow(() -> new ResourceServiceException("Unexpected error", "500")).getS3Location();
-            return resourceMapper.toResponse(resourceId, s3Location);
+            Resource resource = resourceRepository.findById(resourceId)
+                    .orElseThrow(() -> new ResourceServiceException("Unexpected error", "500"));
+            return resourceMapper.toResponse(resource);
         }).toList();
     }
 
@@ -89,12 +113,14 @@ public class ResourceService {
         List<Resource> resourcesToDelete = resourceRepository.findAllById(existingIds);
         resourcesToDelete.forEach(resource -> {
             try {
-                s3Service.deleteFromS3(resource.getS3Location());
+                s3Service.deleteFromS3(resource.getS3Location(), resource.getStorageType());
             } catch (Exception e) {
                 log.error("Failed to delete file from S3 for resource ID: {}", resource.getId(), e);
             }
         });
         resourceRepository.deleteByIdIn(existingIds);
+        String existingIdsStr = String.join(",", existingIds.stream().map(String::valueOf).toList());
+        songSvcClient.deleteSongsById(existingIdsStr);
         return existingIds;
     }
 
@@ -103,7 +129,7 @@ public class ResourceService {
         List<Resource> allResources = resourceRepository.findAll();
         allResources.forEach(resource -> {
             try {
-                s3Service.deleteFromS3(resource.getS3Location());
+                s3Service.deleteFromS3(resource.getS3Location(), resource.getStorageType());
             } catch (Exception e) {
                 log.error("Failed to delete file from S3 for resource ID: {}", resource.getId(), e);
             }
@@ -139,9 +165,43 @@ public class ResourceService {
         return resourceRepository.findAllById(ids).stream().map(Resource::getId).toList();
     }
 
-    private Resource createResourceRecord() {
+    private Resource createResourceRecord(String s3Location, String storageType) {
         Resource resource = new Resource();
-        resource.setS3Location("");
+        resource.setS3Location(s3Location);
+        resource.setStorageType(storageType);
         return resourceRepository.save(resource);
+    }
+
+    public Storage getStorageByType(String storageType) {
+        return storageSvcClient.getStorages().stream()
+                .filter(storage -> storage.getStorageType().equalsIgnoreCase(storageType))
+                .findFirst()
+                .orElseThrow(() -> new ResourceServiceException("Storage type not found: " + storageType, "500"));
+    }
+
+    private String moveToPermanentStorage(Long resourceId) {
+        Resource resource = resourceRepository.findById(resourceId)
+                .orElseThrow(() -> new ResourceServiceException("Resource not found", "404"));
+        String newS3Location = moveToPermanent(resource.getS3Location(), resource.getStorageType());
+        resource.setS3Location(newS3Location);
+        resourceRepository.save(resource);
+        return newS3Location;
+    }
+
+    private String moveToPermanent(String s3Location, String currentStorageType) {
+        byte[] data = s3Service.downloadFromS3(s3Location);
+        s3Service.deleteFromS3(s3Location, currentStorageType);
+        Storage permanentStorage = getStorageByType(PERMANENT);
+        return s3Service.uploadToS3(data, permanentStorage);
+    }
+
+    @Retryable(retryFor = {Exception.class}, maxAttemptsExpression = "#{${retry.maxAttempts}}", backoff = @Backoff(delayExpression = "#{${retry.delay}}", multiplierExpression = "#{${retry.multiplier}}"))
+    public Boolean getResourceDataWithExceptionToTestRetry(Integer id) {
+        if (getResourceDataTestCounter.incrementAndGet() <= 4) { // Fail twice intentionally
+            log.info("Intentionally failing getResourceData, attempt {}", getResourceDataTestCounter.get());
+            throw new RuntimeException("Intentional failure for testing retries in getResourceData");
+        }
+        log.info("getResourceDataWithExceptionToTest successful");
+        return true;
     }
 }

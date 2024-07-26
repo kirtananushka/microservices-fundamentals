@@ -1,6 +1,5 @@
 server:
   port: 8070
-
 spring:
   application:
     name: "gateway-svc"
@@ -15,15 +14,17 @@ spring:
           uri: lb://song-svc
           predicates:
             - Path=/songs/**
-
+        - id: storage-service
+          uri: lb://storage-svc
+          predicates:
+            - Path=/storages/**
 eureka:
   client:
     serviceUrl:
       defaultZone: "http://${EUREKA_HOST:localhost}:8761/eureka/"
   instance:
-    leaseRenewalIntervalInSeconds: 10
-    leaseExpirationDurationInSeconds: 30
-
+    leaseRenewalIntervalInSeconds: 5
+    leaseExpirationDurationInSeconds: 5
 management:
   endpoint:
     health:
@@ -35,4 +36,3 @@ management:
       base-path: /
       path-mapping:
         health: gateway-svc/health
-

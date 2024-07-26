@@ -1,13 +1,289 @@
 {
   "info": {
-    "name": "MSFundamentals: Gateway API",
+    "name": "MSFundamentals API",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
     {
+      "name": "Resources And Songs",
+      "item": [
+        {
+          "name": "Create Resource",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();\r",
+                  "if (jsonData.id) {\r",
+                  "    pm.environment.set(\"msf.resource.id\", jsonData.id);\r",
+                  "}\r",
+                  ""
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "audio/mpeg"
+              }
+            ],
+            "body": {
+              "mode": "file",
+              "file": {
+                "src": ""
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8070/resources",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8070",
+              "path": [
+                "resources"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Resource by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "audio/mpeg"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8070/resources/{{msf.resource.id}}",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8070",
+              "path": [
+                "resources",
+                "{{msf.resource.id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Song by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "audio/mpeg"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8070/songs/{{msf.resource.id}}",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8070",
+              "path": [
+                "songs",
+                "{{msf.resource.id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Resource by ID",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "audio/mpeg"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8070/resources?id={{msf.resource.id}}",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8070",
+              "path": [
+                "resources"
+              ],
+              "query": [
+                {
+                  "key": "id",
+                  "value": "{{msf.resource.id}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Resources",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "audio/mpeg"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8070/resources",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8070",
+              "path": [
+                "resources"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Songs",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "audio/mpeg"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8070/songs",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8070",
+              "path": [
+                "songs"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Storages And Buckets",
+      "item": [
+        {
+          "name": "Create Storage",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"storageType\": \"PERMANENT\",\r\n    \"bucket\": \"demo-bucket\",\r\n    \"path\": \"files\"\r\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8070/storages",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8070",
+              "path": [
+                "storages"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Storages",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8070/storages",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8070",
+              "path": [
+                "storages"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Buckets",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8070/resources/buckets",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8070",
+              "path": [
+                "resources",
+                "buckets"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Storage",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8070/storages?ids=1,2",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8070",
+              "path": [
+                "storages"
+              ],
+              "query": [
+                {
+                  "key": "ids",
+                  "value": "1,2"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
       "name": "Gateway Health Check",
       "request": {
         "method": "GET",
+        "header": [],
         "url": {
           "raw": "http://localhost:8070/gateway-svc/health",
           "protocol": "http",
@@ -20,113 +296,8 @@
             "health"
           ]
         }
-      }
-    },
-    {
-      "name": "Create Resource GW",
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "audio/mpeg"
-          }
-        ],
-        "body": {
-          "mode": "file",
-          "file": {
-            "src": ""
-          }
-        },
-        "url": {
-          "raw": "http://localhost:8070/resources",
-          "protocol": "http",
-          "host": [
-            "localhost"
-          ],
-          "port": "8070",
-          "path": [
-            "resources"
-          ]
-        }
-      }
-    },
-    {
-      "name": "Get Resource by ID GW",
-      "request": {
-        "method": "GET",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "audio/mpeg"
-          }
-        ],
-        "url": {
-          "raw": "http://localhost:8070/resources/1",
-          "protocol": "http",
-          "host": [
-            "localhost"
-          ],
-          "port": "8070",
-          "path": [
-            "resources",
-            "1"
-          ]
-        }
-      }
-    },
-    {
-      "name": "Get Song by ID GW",
-      "request": {
-        "method": "GET",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "audio/mpeg"
-          }
-        ],
-        "url": {
-          "raw": "http://localhost:8070/songs/1",
-          "protocol": "http",
-          "host": [
-            "localhost"
-          ],
-          "port": "8070",
-          "path": [
-            "songs",
-            "1"
-          ]
-        }
-      }
-    },
-    {
-      "name": "Delete Resource by ID GW",
-      "request": {
-        "method": "DELETE",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "audio/mpeg"
-          }
-        ],
-        "url": {
-          "raw": "http://localhost:8070/resources?id=1",
-          "protocol": "http",
-          "host": [
-            "localhost"
-          ],
-          "port": "8070",
-          "path": [
-            "resources"
-          ],
-          "query": [
-            {
-              "key": "id",
-              "value": "1"
-            }
-          ]
-        }
-      }
+      },
+      "response": []
     }
   ]
 }
