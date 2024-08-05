@@ -1,5 +1,6 @@
 package com.tananushka.resource.proc.client;
 
+import com.tananushka.resource.proc.config.logging.FeignClientLoggingConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.MediaType;
@@ -8,7 +9,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-@FeignClient(name = "${svc.resource-svc.name}", fallback = ResourceSvcClient.ResourceClientFallback.class)
+@FeignClient(
+        name = "${svc.resource-svc.name}",
+        fallback = ResourceSvcClient.ResourceClientFallback.class,
+        configuration = FeignClientLoggingConfig.class)
 public interface ResourceSvcClient {
     @GetMapping(value = "${svc.resource-svc.resources-endpoint}/{id}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     ResponseEntity<byte[]> getAudioData(@PathVariable Integer id);

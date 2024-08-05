@@ -4,6 +4,11 @@ logging:
   level:
     root: WARN
     com.tananushka.storage.svc: INFO
+  logback:
+    rollingpolicy:
+      max-file-size: 10MB
+      max-history: 5
+  config: classpath:logback.xml
 spring:
   application:
     name: "storage-svc"
@@ -29,10 +34,18 @@ management:
   endpoint:
     health:
       show-details: always
+    metrics:
+      enabled: true
+    prometheus:
+      enabled: true
   endpoints:
     web:
       exposure:
-        include: health, info
+        include: health, info, prometheus
       base-path: /
       path-mapping:
         health: storage-svc/health
+  prometheus:
+    metrics:
+      export:
+        enabled: true

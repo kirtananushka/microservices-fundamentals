@@ -4,6 +4,7 @@ import com.tananushka.storage.svc.dto.StorageDto;
 import com.tananushka.storage.svc.service.StorageService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,6 +21,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/storages")
 @RequiredArgsConstructor
+@Slf4j
 public class StorageController {
     private final StorageService storageService;
 

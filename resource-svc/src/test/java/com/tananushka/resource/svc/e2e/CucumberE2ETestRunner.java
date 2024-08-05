@@ -4,7 +4,7 @@ import io.cucumber.junit.Cucumber;
 import io.cucumber.junit.CucumberOptions;
 import org.junit.runner.RunWith;
 
-// Run all microservices before running this test
+// Run containers before running this test
 @RunWith(Cucumber.class)
 @CucumberOptions(
         features = "src/test/resources/features",

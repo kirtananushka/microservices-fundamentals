@@ -62,7 +62,7 @@ cloud:
       accessKey: "${AWS_ACCESS_KEY:accesskey}"
       secretKey: "${AWS_SECRET_KEY:secretkey}"
 retry:
-  maxAttempts: 10
+  maxAttempts: 1
   delay: 1000
   multiplier: 2.0
 resilience4j:

@@ -11,6 +11,7 @@
     </envs>
     <option name="FRAME_DEACTIVATION_UPDATE_POLICY" value="UpdateClassesAndResources"/>
     <module name="resource-svc"/>
+    <option name="SHORTEN_COMMAND_LINE" value="ARGS_FILE"/>
     <option name="SPRING_BOOT_MAIN_CLASS" value="com.tananushka.resource.svc.ResourceSvcApp"/>
     <extension name="software.aws.toolkits.jetbrains.core.execution.JavaAwsConnectionExtension">
       <option name="credential"/>

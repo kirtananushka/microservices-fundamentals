@@ -43,6 +43,9 @@ public class SongService {
 
     @Transactional
     public List<Integer> deleteSongsByResourceId(String csvIds) {
+        if (csvIds.isBlank()) {
+            return List.of();
+        }
         validateCsvIdsString(csvIds);
         List<Integer> ids = parseCsvIds(csvIds);
         List<Integer> existingIds = validateResourceExistence(ids);

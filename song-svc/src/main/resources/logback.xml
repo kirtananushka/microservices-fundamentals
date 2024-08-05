@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+  <springProperty name="appName" source="spring.application.name"/>
+  <property name="LOG_PATTERN" value="%date{yyyy-MM-dd HH:mm:ss.SSS} %5p [%t] %logger{36} [%X{traceId:-}] - %msg%n"/>
+  <!-- Console Appender -->
+  <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>${LOG_PATTERN}</pattern>
+    </encoder>
+  </appender>
+  <!-- File Appender -->
+  <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>logs/song-svc.log</file>
+    <encoder>
+      <pattern>${LOG_PATTERN}</pattern>
+    </encoder>
+    <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+      <fileNamePattern>logs/archived/song-svc.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+      <maxFileSize>10MB</maxFileSize>
+      <totalSizeCap>1GB</totalSizeCap>
+      <maxHistory>60</maxHistory>
+    </rollingPolicy>
+  </appender>
+  <!-- Logstash Appender -->
+  <appender name="LOGSTASH" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+    <destination>${LOGSTASH_HOST:-localhost}:${LOGSTASH_PORT:-5000}</destination>
+    <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+      <customFields>{"application":"${appName}"}</customFields>
+      <fieldNames>
+        <timestamp>timestamp</timestamp>
+        <message>message</message>
+        <logger>logger</logger>
+        <thread>thread</thread>
+        <level>level</level>
+        <mdc>mdc</mdc>
+      </fieldNames>
+    </encoder>
+  </appender>
+  <!-- Root Logger -->
+  <root level="INFO">
+    <appender-ref ref="CONSOLE"/>
+    <appender-ref ref="FILE"/>
+    <appender-ref ref="LOGSTASH"/>
+  </root>
+  <!-- Application Logger -->
+  <logger name="com.tananushka.song.svc" level="DEBUG" additivity="false">
+    <appender-ref ref="CONSOLE"/>
+    <appender-ref ref="FILE"/>
+    <appender-ref ref="LOGSTASH"/>
+  </logger>
+</configuration>

@@ -6,12 +6,14 @@ import com.tananushka.resource.svc.dto.ResourceResponse;
 import com.tananushka.resource.svc.dto.Storage;
 import com.tananushka.resource.svc.entity.Resource;
 import com.tananushka.resource.svc.exception.ResourceServiceException;
+import com.tananushka.resource.svc.interceptor.FeignTraceIdInterceptor;
 import com.tananushka.resource.svc.mapper.ResourceMapper;
 import com.tananushka.resource.svc.repository.ResourceRepository;
 import jakarta.jms.JMSException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tika.Tika;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.retry.annotation.Backoff;
@@ -73,10 +75,14 @@ public class ResourceService {
     @Retryable(retryFor = {Exception.class}, maxAttemptsExpression = "#{${retry.maxAttempts}}", backoff = @Backoff(delayExpression = "#{${retry.delay}}", multiplierExpression = "#{${retry.multiplier}}"))
     public void sendMessage(Long resourceId) {
         jmsTemplate.convertAndSend(resourceQueue, resourceId, message -> {
-            log.debug("Message sent with resourceId={} to the queue={}", resourceId, resourceQueue);
+            log.info("Sending message with resourceId={} to the queue={}", resourceId, resourceQueue);
+            String traceId = MDC.get("traceId");
+            if (traceId != null) {
+                message.setStringProperty(FeignTraceIdInterceptor.TRACE_ID_HEADER, traceId);
+            }
             try {
                 message.acknowledge();
-                log.debug("Message with resourceId={} acknowledged", resourceId);
+                log.info("Message with resourceId={} acknowledged", resourceId);
             } catch (JMSException e) {
                 log.error("Failed to acknowledge message with resourceId={}", resourceId);
                 throw new ResourceServiceException("Failed to acknowledge message", "500");
@@ -88,7 +94,7 @@ public class ResourceService {
     @Retryable(retryFor = {Exception.class}, maxAttemptsExpression = "#{${retry.maxAttempts}}", backoff = @Backoff(delayExpression = "#{${retry.delay}}", multiplierExpression = "#{${retry.multiplier}}"))
     public byte[] getResourceData(Integer id) {
         Resource resource = resourceRepository.findById(Long.valueOf(id))
-                .orElseThrow(() -> new ResourceServiceException("File is not ready yet", "5001"));
+                .orElseThrow(() -> new ResourceServiceException("File with ID=" + id + " is not ready yet and cannot be retrieved from s3", "5001"));
         return s3Service.downloadFromS3(resource.getS3Location());
     }
 
@@ -173,7 +179,8 @@ public class ResourceService {
     }
 
     public Storage getStorageByType(String storageType) {
-        return storageSvcClient.getStorages().stream()
+        String traceId = MDC.get("traceId");
+        return storageSvcClient.getStorages(traceId).stream()
                 .filter(storage -> storage.getStorageType().equalsIgnoreCase(storageType))
                 .findFirst()
                 .orElseThrow(() -> new ResourceServiceException("Storage type not found: " + storageType, "500"));

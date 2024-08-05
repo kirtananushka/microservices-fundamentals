@@ -1,5 +1,6 @@
 package com.tananushka.resource.proc.client;
 
+import com.tananushka.resource.proc.config.logging.FeignClientLoggingConfig;
 import com.tananushka.resource.proc.dto.MetadataRequest;
 import com.tananushka.resource.proc.dto.SongIdResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -11,8 +12,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 @FeignClient(
         name = "${svc.song-svc.name}",
-        fallback = SongSvcClient.SongClientFallback.class
-)
+        fallback = SongSvcClient.SongClientFallback.class,
+        configuration = FeignClientLoggingConfig.class)
 public interface SongSvcClient {
     @PostMapping("${svc.song-svc.songs-endpoint}")
     SongIdResponse saveMetadata(@RequestBody MetadataRequest metadataRequest);

@@ -5,6 +5,11 @@ logging:
     root: INFO
     com.netflix.discovery: DEBUG
     org.springframework.cloud.netflix.eureka.server: DEBUG
+  logback:
+    rollingpolicy:
+      max-file-size: 10MB
+      max-history: 5
+  config: classpath:logback.xml
 spring:
   application:
     name: "eureka-server"
@@ -20,10 +25,18 @@ management:
   endpoint:
     health:
       show-details: always
+    metrics:
+      enabled: true
+    prometheus:
+      enabled: true
   endpoints:
     web:
       exposure:
-        include: health
+        include: health, info, prometheus
       base-path: /
       path-mapping:
         health: eureka-svc/health
+  prometheus:
+    metrics:
+      export:
+        enabled: true

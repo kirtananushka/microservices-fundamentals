@@ -1,5 +1,13 @@
 server:
   port: 8070
+logging:
+  level:
+    root: INFO
+  logback:
+    rollingpolicy:
+      max-file-size: 10MB
+      max-history: 5
+  config: classpath:logback.xml
 spring:
   application:
     name: "gateway-svc"
@@ -18,6 +26,36 @@ spring:
           uri: lb://storage-svc
           predicates:
             - Path=/storages/**
+        - id: grafana
+          uri: http://grafana:3000
+          predicates:
+            - Path=/grafana/**
+          filters:
+            - RewritePath=/grafana/(?<segment>.*), /${segment}
+            - AddRequestHeader=X-Forwarded-Prefix, /grafana
+        - id: kibana
+          uri: http://kibana:5601
+          predicates:
+            - Path=/kibana/**
+          filters:
+            - RewritePath=/(?<segment>.*), /${segment}
+            #            - RewritePath=/kibana/(?<segment>.*), /${segment}
+            - AddRequestHeader=X-Forwarded-Prefix, /kibana
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins:
+              - "http://localhost:3000"
+              - "http://localhost:9090"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+            allowedHeaders:
+              - "*"
+            allowCredentials: true
 eureka:
   client:
     serviceUrl:
@@ -29,10 +67,18 @@ management:
   endpoint:
     health:
       show-details: always
+    metrics:
+      enabled: true
+    prometheus:
+      enabled: true
   endpoints:
     web:
       exposure:
-        include: health, info
+        include: health, info, prometheus
       base-path: /
       path-mapping:
         health: gateway-svc/health
+  prometheus:
+    metrics:
+      export:
+        enabled: true

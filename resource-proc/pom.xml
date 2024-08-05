@@ -16,6 +16,7 @@
     <java.version>17</java.version>
     <spring-cloud.version>2023.0.2</spring-cloud.version>
     <tika.version>1.5</tika.version>
+    <logstash-logback-encoder.version>7.4</logstash-logback-encoder.version>
     <cucumber.version>7.18.0</cucumber.version>
   </properties>
   <dependencies>
@@ -62,6 +63,16 @@
       <groupId>org.apache.tika</groupId>
       <artifactId>tika-parsers</artifactId>
       <version>${tika.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>io.micrometer</groupId>
+      <artifactId>micrometer-registry-prometheus</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>net.logstash.logback</groupId>
+      <artifactId>logstash-logback-encoder</artifactId>
+      <version>${logstash-logback-encoder.version}</version>
     </dependency>
 
     <!-- Test dependencies -->

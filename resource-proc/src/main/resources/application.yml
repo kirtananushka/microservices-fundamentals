@@ -2,10 +2,15 @@ server:
   port: 8073
 logging:
   level:
-    root: info
-    org.springframework.retry: info
-    com.tananushka.resource.proc.service: info
-    com.tananushka.resource.proc.service.ResourceProcessorService: info
+    root: WARN
+    org.springframework.retry: INFO
+    com.tananushka.resource.proc.service: INFO
+    com.tananushka.resource.proc.service.ResourceProcessorService: DEBUG
+  logback:
+    rollingpolicy:
+      max-file-size: 10MB
+      max-history: 5
+  config: classpath:logback.xml
 spring:
   application:
     name: "resource-proc"
@@ -39,10 +44,18 @@ management:
   endpoint:
     health:
       show-details: always
+    metrics:
+      enabled: true
+    prometheus:
+      enabled: true
   endpoints:
     web:
       exposure:
-        include: health, info
+        include: health, info, prometheus
       base-path: /
       path-mapping:
         health: resource-proc/health
+  prometheus:
+    metrics:
+      export:
+        enabled: true

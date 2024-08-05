@@ -2,8 +2,13 @@ server:
   port: 8072
 logging:
   level:
-    root: warn
-    com.tananushka.song.svc: info
+    root: WARN
+    com.tananushka.song.svc: INFO
+  logback:
+    rollingpolicy:
+      max-file-size: 10MB
+      max-history: 5
+  config: classpath:logback.xml
 spring:
   application:
     name: "song-svc"
@@ -22,10 +27,18 @@ management:
       group:
         custom:
           include: db
+    metrics:
+      enabled: true
+    prometheus:
+      enabled: true
   endpoints:
     web:
       exposure:
-        include: health, info
+        include: health, info, prometheus
       base-path: /
       path-mapping:
         health: song-svc/health
+  prometheus:
+    metrics:
+      export:
+        enabled: true
